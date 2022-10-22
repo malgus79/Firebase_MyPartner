@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.firebase.ui.auth.AuthUI
+import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
 import com.mypartner.databinding.ActivityMainBinding
@@ -35,6 +36,15 @@ class MainActivity : AppCompatActivity() {
                 if (response == null) {
                     Toast.makeText(this, "Hasta pronto", Toast.LENGTH_SHORT).show()
                     finish()
+                } else { //otro tipo de error
+                    response.error?.let {
+                        if (it.errorCode == ErrorCodes.NO_NETWORK) {
+                            Toast.makeText(this, "Sin internet", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(this, "Código de error: ${it.errorCode}",
+                                Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             }
         }
@@ -54,6 +64,7 @@ class MainActivity : AppCompatActivity() {
             //usuario autenticado
             if (auth.currentUser != null) {
                 supportActionBar?.title = auth.currentUser?.displayName
+                binding.llProgress.visibility = View.GONE
                 binding.tvInit.visibility = View.VISIBLE
             } else {
                 //habilitar todos los proveedores de auth
@@ -64,6 +75,7 @@ class MainActivity : AppCompatActivity() {
                 resultLauncher.launch(AuthUI.getInstance()
                     .createSignInIntentBuilder()
                     .setAvailableProviders(providers)
+                    .setIsSmartLockEnabled(false) //desactivar la muestra de las opciones de uauario
                     .build())
             }
         }
@@ -95,6 +107,7 @@ class MainActivity : AppCompatActivity() {
                     .addOnCompleteListener {
                         if (it.isSuccessful) {
                             binding.tvInit.visibility = View.GONE
+                            binding.llProgress.visibility = View.VISIBLE
                         } else {
                             Toast.makeText(this, "No se pudo cerrar la sesión", Toast.LENGTH_SHORT).show()
                         }
