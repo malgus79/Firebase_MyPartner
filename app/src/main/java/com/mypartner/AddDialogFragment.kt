@@ -51,8 +51,8 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
 
             positiveButton?.setOnClickListener {
                 binding?.let {
-//                    enableUI(false)
-//
+                    enableUI(false)
+
                     if (product == null) {  //entonces se crea el producto
                         val product = Product(
                             name = it.etName.text.toString().trim(),
@@ -111,7 +111,7 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
                 Toast.makeText(activity, "Error al insertar.", Toast.LENGTH_SHORT).show()
             }
             .addOnCompleteListener {
-//                enableUI(true)
+                enableUI(true)
                 dismiss()
             }
     }
@@ -131,24 +131,25 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
                     Toast.makeText(activity, "Error al actualizar.", Toast.LENGTH_SHORT).show()
                 }
                 .addOnCompleteListener {
-//                    enableUI(true)
+                    enableUI(true)
                     dismiss()
                 }
         }
     }
 
-//    private fun enableUI(enable: Boolean){
-//        positiveButton?.isEnabled = enable
-//        negativeButton?.isEnabled = enable
-//        binding?.let {
-//            with(it){
-//                etName.isEnabled = enable
-//                etDescription.isEnabled = enable
-//                etQuantity.isEnabled = enable
-//                etPrice.isEnabled = enable
-//            }
-//        }
-//    }
+    //bloquear temporalmente el addFragment para no duplicar ni volver a clickear hasta que se carge todoo ok
+    private fun enableUI(enable: Boolean){
+        positiveButton?.isEnabled = enable
+        negativeButton?.isEnabled = enable
+        binding?.let {
+            with(it){
+                etName.isEnabled = enable
+                etDescription.isEnabled = enable
+                etQuantity.isEnabled = enable
+                etPrice.isEnabled = enable
+            }
+        }
+    }
 
     //desvincular binding
     override fun onDestroyView() {
