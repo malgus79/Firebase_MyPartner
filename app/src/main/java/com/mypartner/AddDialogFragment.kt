@@ -40,6 +40,7 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
         return super.onCreateDialog(savedInstanceState)
     }
 
+    //mostrar el producto
     override fun onShow(dialogInterface: DialogInterface?) {
 //        initProduct()
 
@@ -49,18 +50,18 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
             negativeButton = it.getButton(Dialog.BUTTON_NEGATIVE)
 
             positiveButton?.setOnClickListener {
-//                binding?.let {
+                binding?.let {
 //                    enableUI(false)
 //
 //                    if (product == null) {
-//                        val product = Product(
-//                            name = it.etName.text.toString().trim(),
-//                            description = it.etDescription.text.toString().trim(),
-//                            quantity = it.etQuantity.text.toString().toInt(),
-//                            price = it.etPrice.text.toString().toDouble()
-//                        )
-//
-//                        save(product)
+                        val product = Product(
+                            name = it.etName.text.toString().trim(),
+                            description = it.etDescription.text.toString().trim(),
+                            quantity = it.etQuantity.text.toString().toInt(),
+                            price = it.etPrice.text.toString().toDouble()
+                        )
+
+                        save(product)
 //                    } else {
 //                        product?.apply {
 //                            name = it.etName.text.toString().trim()
@@ -71,7 +72,7 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
 //                            update(this)
 //                        }
 //                    }
-//                }
+                }
             }
 
             negativeButton?.setOnClickListener {
@@ -92,21 +93,22 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
 //        }
 //    }
 
-//    private fun save(product: Product){
-//        val db = FirebaseFirestore.getInstance()
-//        db.collection(Constants.COLL_PRODUCTS)
-//            .add(product)
-//            .addOnSuccessListener {
-//                Toast.makeText(activity, "Producto añadido.", Toast.LENGTH_SHORT).show()
-//            }
-//            .addOnFailureListener {
-//                Toast.makeText(activity, "Error al insertar.", Toast.LENGTH_SHORT).show()
-//            }
-//            .addOnCompleteListener {
+    //insertar producto
+    private fun save(product: Product){
+        val db = FirebaseFirestore.getInstance()
+        db.collection(Constants.COLL_PRODUCTS)
+            .add(product)
+            .addOnSuccessListener {
+                Toast.makeText(activity, "Producto añadido.", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener {
+                Toast.makeText(activity, "Error al insertar.", Toast.LENGTH_SHORT).show()
+            }
+            .addOnCompleteListener {
 //                enableUI(true)
-//                dismiss()
-//            }
-//    }
+                dismiss()
+            }
+    }
 
 //    private fun update(product: Product){
 //        val db = FirebaseFirestore.getInstance()
