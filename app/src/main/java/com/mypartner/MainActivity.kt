@@ -69,8 +69,8 @@ class MainActivity : AppCompatActivity(), OnProductListener {
         configAuth()
         configRecyclerView()
         //configFirestore()
+        //configFirestoreRealTime()
         configButtons()
-        configFirestoreRealTime()
 
     }
 
@@ -102,11 +102,13 @@ class MainActivity : AppCompatActivity(), OnProductListener {
     override fun onResume() {
         super.onResume()
         firebaseAuth.addAuthStateListener(authStateListener)
+        configFirestoreRealTime()  //se ejecuta unicamente en onResume
     }
 
     override fun onPause() {
         super.onPause()
-        firebaseAuth.removeAuthStateListener { authStateListener }
+        firebaseAuth.removeAuthStateListener(authStateListener)
+        firestoreListener.remove()  //quitar el listener cada vez que se pause la app
     }
 
     //config recyclerView
@@ -207,10 +209,24 @@ class MainActivity : AppCompatActivity(), OnProductListener {
 
 
     override fun onClick(product: Product) {
-        TODO("Not yet implemented")
+//        productSelected = product
+//        AddDialogFragment().show(supportFragmentManager, AddDialogFragment::class.java.simpleName)
     }
 
+    //al hacer click largo
     override fun onLongClick(product: Product) {
-        TODO("Not yet implemented")
+        val db = FirebaseFirestore.getInstance()
+        val productRef = db.collection(Constants.COLL_PRODUCTS)
+
+        //eliminar segun el id
+        product.id?.let { id ->
+            productRef.document(id)
+                .delete()
+                .addOnFailureListener {
+                    Toast.makeText(this, "Error al eliminar.", Toast.LENGTH_SHORT).show()
+                }
+        }
     }
+
+//    override fun getProductSelected(): Product? = productSelected
 }
