@@ -33,17 +33,39 @@ class ProductAdapter(private val productList: MutableList<Product>,
     override fun getItemCount(): Int = productList.size
 
     //añadir elementos en forma local
-    fun add(product: Product){
-        if (!productList.contains(product)){
+    fun add(product: Product) {
+        if (!productList.contains(product)) {
+            //agregar si no existe
             productList.add(product)
             notifyItemInserted(productList.size - 1)
+        } else {
+            //actualizarlo si ya existe
+            update(product)
         }
     }
 
-    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view){
+    //actualiar producto
+    fun update(product: Product) {
+        val index = productList.indexOf(product)
+        if (index != -1) {
+            productList.set(index, product)
+            notifyItemChanged(index)
+        }
+    }
+
+    //eliminar producto
+    fun delete(product: Product) {
+        val index = productList.indexOf(product)
+        if (index != -1) {
+            productList.removeAt(index)
+            notifyItemRemoved(index)
+        }
+    }
+
+    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val binding = ItemProductBinding.bind(view)
 
-        fun setListener(product: Product){
+        fun setListener(product: Product) {
             binding.root.setOnClickListener {
                 listener.onClick(product)
             }
