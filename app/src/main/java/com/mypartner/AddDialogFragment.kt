@@ -53,7 +53,7 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
                 binding?.let {
 //                    enableUI(false)
 //
-//                    if (product == null) {
+                    if (product == null) {  //entonces se crea el producto
                         val product = Product(
                             name = it.etName.text.toString().trim(),
                             description = it.etDescription.text.toString().trim(),
@@ -62,16 +62,18 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
                         )
 
                         save(product)
-//                    } else {
-//                        product?.apply {
-//                            name = it.etName.text.toString().trim()
-//                            description = it.etDescription.text.toString().trim()
-//                            quantity = it.etQuantity.text.toString().toInt()
-//                            price = it.etPrice.text.toString().toDouble()
-//
-//                            update(this)
-//                        }
-//                    }
+
+                    } else {
+                        //retomar el producto y configurarle los nuevos valores
+                        product?.apply {
+                            name = it.etName.text.toString().trim()
+                            description = it.etDescription.text.toString().trim()
+                            quantity = it.etQuantity.text.toString().toInt()
+                            price = it.etPrice.text.toString().toDouble()
+
+                            update(this)
+                        }
+                    }
                 }
             }
 
@@ -114,25 +116,26 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
             }
     }
 
-//    private fun update(product: Product){
-//        val db = FirebaseFirestore.getInstance()
-//
-//        product.id?.let { id ->
-//            db.collection(Constants.COLL_PRODUCTS)
-//                .document(id)
-//                .set(product)
-//                .addOnSuccessListener {
-//                    Toast.makeText(activity, "Producto actualizado.", Toast.LENGTH_SHORT).show()
-//                }
-//                .addOnFailureListener {
-//                    Toast.makeText(activity, "Error al actualizar.", Toast.LENGTH_SHORT).show()
-//                }
-//                .addOnCompleteListener {
+    //actualizar producto
+    private fun update(product: Product){
+        val db = FirebaseFirestore.getInstance()
+
+        product.id?.let { id ->
+            db.collection(Constants.COLL_PRODUCTS)
+                .document(id)
+                .set(product)
+                .addOnSuccessListener {
+                    Toast.makeText(activity, "Producto actualizado.", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(activity, "Error al actualizar.", Toast.LENGTH_SHORT).show()
+                }
+                .addOnCompleteListener {
 //                    enableUI(true)
-//                    dismiss()
-//                }
-//        }
-//    }
+                    dismiss()
+                }
+        }
+    }
 
 //    private fun enableUI(enable: Boolean){
 //        positiveButton?.isEnabled = enable
