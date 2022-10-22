@@ -12,6 +12,7 @@ import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.mypartner.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity(), OnProductListener {
@@ -60,6 +61,7 @@ class MainActivity : AppCompatActivity(), OnProductListener {
 
         configAuth()
         configRecyclerView()
+        configFirestore()
 
     }
 
@@ -106,11 +108,11 @@ class MainActivity : AppCompatActivity(), OnProductListener {
             adapter = this@MainActivity.adapter
         }
 
-        (1..20).forEach {
-            val product = Product(it.toString(), "Producto $it", "Este producto es el $it",
-                "", it, it * 1.1)
-            adapter.add(product)
-        }
+//        (1..20).forEach {
+//            val product = Product(it.toString(), "Producto $it", "Este producto es el $it",
+//                "", it, it * 1.1)
+//            adapter.add(product)
+//        }
     }
 
 
@@ -140,6 +142,26 @@ class MainActivity : AppCompatActivity(), OnProductListener {
         }
         return super.onOptionsItemSelected(item)
     }
+
+    //config Firestore
+    private fun configFirestore() {
+        val db = FirebaseFirestore.getInstance()
+
+        //ruta
+        db.collection(Constants.COLL_PRODUCTS)
+            .get()
+            .addOnSuccessListener { snapshots ->
+                for (document in snapshots){
+                    val product = document.toObject(Product::class.java)
+                    product.id = document.id
+                    adapter.add(product)
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Error al consultar datos.", Toast.LENGTH_SHORT).show()
+            }
+    }
+
 
     override fun onClick(product: Product) {
         TODO("Not yet implemented")
