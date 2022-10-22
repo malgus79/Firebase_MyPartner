@@ -18,7 +18,7 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
     private var positiveButton: Button? = null
     private var negativeButton: Button? = null
 
-//    private var product: Product? = null
+    private var product: Product? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         activity?.let { activity ->
@@ -42,7 +42,7 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
 
     //mostrar el producto
     override fun onShow(dialogInterface: DialogInterface?) {
-//        initProduct()
+        initProduct()
 
         val dialog = dialog as? AlertDialog
         dialog?.let {
@@ -81,17 +81,21 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
         }
     }
 
-//    private fun initProduct() {
-//        product = (activity as? MainAux)?.getProductSelected()
-//        product?.let { product ->
-//            binding?.let {
-//                it.etName.setText(product.name)
-//                it.etDescription.setText(product.description)
-//                it.etQuantity.setText(product.quantity.toString())
-//                it.etPrice.setText(product.price.toString())
-//            }
-//        }
-//    }
+    //inicializar la var
+    private fun initProduct() {
+        //cast
+        product = (activity as? MainAux)?.getProductSelected()
+
+        //rellenar le formmulario
+        product?.let { product ->
+            binding?.let {
+                it.etName.setText(product.name)
+                it.etDescription.setText(product.description)
+                it.etQuantity.setText(product.quantity.toString())
+                it.etPrice.setText(product.price.toString())
+            }
+        }
+    }
 
     //insertar producto
     private fun save(product: Product){

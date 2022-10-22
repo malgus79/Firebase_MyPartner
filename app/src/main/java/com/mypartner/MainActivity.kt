@@ -17,7 +17,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.mypartner.databinding.ActivityMainBinding
 
-class MainActivity : AppCompatActivity(), OnProductListener {
+class MainActivity : AppCompatActivity(), OnProductListener, MainAux {
 
     private lateinit var binding: ActivityMainBinding
 
@@ -201,16 +201,15 @@ class MainActivity : AppCompatActivity(), OnProductListener {
 
     private fun configButtons(){
         binding.efab.setOnClickListener {
-//            productSelected = null
+            productSelected = null  //darle un valor antes de inicializar el fragment
             AddDialogFragment().show(supportFragmentManager, AddDialogFragment::class.java.simpleName)
         }
     }
 
-
-
+    //al hacer click en le producto
     override fun onClick(product: Product) {
-//        productSelected = product
-//        AddDialogFragment().show(supportFragmentManager, AddDialogFragment::class.java.simpleName)
+        productSelected = product
+        AddDialogFragment().show(supportFragmentManager, AddDialogFragment::class.java.simpleName)
     }
 
     //al hacer click largo
@@ -228,5 +227,6 @@ class MainActivity : AppCompatActivity(), OnProductListener {
         }
     }
 
-//    override fun getProductSelected(): Product? = productSelected
+    //devuelve la var global
+    override fun getProductSelected(): Product? = productSelected
 }
