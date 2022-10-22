@@ -57,7 +57,9 @@ class MainActivity : AppCompatActivity() {
                 binding.tvInit.visibility = View.VISIBLE
             } else {
                 //habilitar todos los proveedores de auth
-                val providers = arrayListOf(AuthUI.IdpConfig.EmailBuilder().build())
+                val providers = arrayListOf(
+                    AuthUI.IdpConfig.EmailBuilder().build(),
+                    AuthUI.IdpConfig.GoogleBuilder().build())
 
                 resultLauncher.launch(AuthUI.getInstance()
                     .createSignInIntentBuilder()
