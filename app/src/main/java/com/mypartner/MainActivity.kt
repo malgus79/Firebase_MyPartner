@@ -62,6 +62,7 @@ class MainActivity : AppCompatActivity(), OnProductListener {
         configAuth()
         configRecyclerView()
         configFirestore()
+        configButtons()
 
     }
 
@@ -73,6 +74,7 @@ class MainActivity : AppCompatActivity(), OnProductListener {
                 supportActionBar?.title = auth.currentUser?.displayName
                 binding.llProgress.visibility = View.GONE
                 binding.nsvProducts.visibility = View.VISIBLE
+                binding.efab.show()
             } else {
                 //habilitar todos los proveedores de auth
                 val providers = arrayListOf(
@@ -134,6 +136,7 @@ class MainActivity : AppCompatActivity(), OnProductListener {
                         if (it.isSuccessful) {
                             binding.nsvProducts.visibility = View.GONE
                             binding.llProgress.visibility = View.VISIBLE
+                            binding.efab.hide()
                         } else {
                             Toast.makeText(this, "No se pudo cerrar la sesión", Toast.LENGTH_SHORT).show()
                         }
@@ -161,6 +164,14 @@ class MainActivity : AppCompatActivity(), OnProductListener {
                 Toast.makeText(this, "Error al consultar datos.", Toast.LENGTH_SHORT).show()
             }
     }
+
+    private fun configButtons(){
+        binding.efab.setOnClickListener {
+//            productSelected = null
+            AddDialogFragment().show(supportFragmentManager, AddDialogFragment::class.java.simpleName)
+        }
+    }
+
 
 
     override fun onClick(product: Product) {
