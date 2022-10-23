@@ -34,6 +34,8 @@ class ProductAdapter(private val productList: MutableList<Product>,
         Glide.with(context)
             .load(product.imgUrl)
             .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .placeholder(R.drawable.ic_access_time)
+            .error(R.drawable.ic_broken_image)
             .centerCrop()
             .into(holder.binding.imgProduct)
     }

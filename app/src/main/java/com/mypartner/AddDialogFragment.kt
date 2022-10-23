@@ -193,9 +193,9 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
                         }
                     }
                     .addOnFailureListener {
-//                        Toast.makeText(activity, "Error al subir imagen.", Toast.LENGTH_SHORT).show()
-//                        enableUI(true)
-//
+                        Toast.makeText(activity, "Error al subir imagen.", Toast.LENGTH_SHORT).show()
+                        enableUI(true)
+
                         eventPost.isSuccess = false
                         callback(eventPost)
                     }
