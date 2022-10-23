@@ -53,5 +53,7 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-auth:8.0.2'
     // Cloud Firestore
     implementation 'com.google.firebase:firebase-firestore-ktx'
+    // Cloud Storage
+    implementation 'com.google.firebase:firebase-storage-ktx'
 
 }

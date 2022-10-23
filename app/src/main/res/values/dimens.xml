@@ -3,5 +3,5 @@
     <dimen name="common_padding_min">8dp</dimen>
     <dimen name="product_img_width">148dp</dimen>
     <dimen name="common_padding_default">16dp</dimen>
-    <dimen name="common_marging_min">8dp</dimen>
+    <dimen name="common_margin_min">8dp</dimen>
 </resources>

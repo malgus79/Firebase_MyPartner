@@ -1,14 +1,22 @@
 package com.mypartner
 
+import android.app.Activity
 import android.app.Dialog
 import android.content.DialogInterface
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import com.mypartner.databinding.FragmentDialogAddBinding
 
 class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
@@ -19,6 +27,23 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
     private var negativeButton: Button? = null
 
     private var product: Product? = null
+
+    private var photoSelectedUri: Uri? = null
+
+    private val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+        if (it.resultCode == Activity.RESULT_OK){
+            photoSelectedUri = it.data?.data
+
+            binding?.imgProductPreview?.setImageURI(photoSelectedUri)  //modo de cargar imagen en el imageView (harcodeado, sin glide)
+//            binding?.let {
+//                Glide.with(this)
+//                    .load(photoSelectedUri)
+//                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+//                    .centerCrop()
+//                    .into(it.imgProductPreview)
+//            }
+        }
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         activity?.let { activity ->
@@ -43,6 +68,7 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
     //mostrar el producto
     override fun onShow(dialogInterface: DialogInterface?) {
         initProduct()
+        configButtons()
 
         val dialog = dialog as? AlertDialog
         dialog?.let {
@@ -52,6 +78,8 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
             positiveButton?.setOnClickListener {
                 binding?.let {
                     enableUI(false)
+
+                    uploadImage()
 
                     if (product == null) {  //entonces se crea el producto
                         val product = Product(
@@ -95,6 +123,68 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
                 it.etDescription.setText(product.description)
                 it.etQuantity.setText(product.quantity.toString())
                 it.etPrice.setText(product.price.toString())
+            }
+        }
+    }
+
+    //config btn de la imagen del producto
+    private fun configButtons(){
+        binding?.let {
+            it.ibProduct.setOnClickListener {
+                openGallery()
+            }
+        }
+    }
+
+    //abrir la galeria
+    private fun openGallery() {
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        resultLauncher.launch(intent)
+    }
+
+    private fun uploadImage(
+//        productId: String?, callback: (EventPost)->Unit
+    ){
+        //instanciar EventPost
+        val eventPost  = EventPost()
+//        eventPost.documentId = productId ?: FirebaseFirestore.getInstance()
+//            .collection(Constants.COLL_PRODUCTS).document().id
+
+        //ruta donde se guardara en storage le imagen
+        eventPost.documentId = FirebaseFirestore.getInstance()
+            .collection(Constants.COLL_PRODUCTS).document().id
+        val storageRef = FirebaseStorage.getInstance().reference.child(Constants.PATH_PRODUCT_IMGES)
+
+        photoSelectedUri?.let { uri ->
+            binding?.let { binding ->
+//                binding.progressBar.visibility = View.VISIBLE
+
+                val photoRef = storageRef.child(eventPost.documentId!!)
+
+                photoRef.putFile(uri)
+//                    .addOnProgressListener {
+//                        val progress = (100 * it.bytesTransferred / it.totalByteCount).toInt()
+//                        it.run {
+//                            binding.progressBar.progress = progress
+//                            binding.tvProgress.text = String.format("%s%%", progress)
+//                        }
+//                    }
+                    .addOnSuccessListener {
+                        //extraer la url para descargar
+                        it.storage.downloadUrl.addOnSuccessListener { downloadUrl ->
+                            Log.i("URL", downloadUrl.toString())
+//                            eventPost.isSuccess = true
+//                            eventPost.photoUrl = downloadUrl.toString()
+//                            callback(eventPost)
+                        }
+                    }
+//                    .addOnFailureListener{
+//                        Toast.makeText(activity, "Error al subir imagen.", Toast.LENGTH_SHORT).show()
+//                        enableUI(true)
+//
+//                        eventPost.isSuccess = false
+//                        callback(eventPost)
+//                    }
             }
         }
     }
