@@ -80,7 +80,7 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
                 binding?.let {
                     enableUI(false)
 
-                    uploadImage() { eventPost ->
+                    uploadImage(product?.id) { eventPost ->
                         if (eventPost.isSuccess) {
                             if (product == null) {  //entonces se crea el producto
                                 val product = Product(
@@ -98,6 +98,7 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
                                 product?.apply {
                                     name = it.etName.text.toString().trim()
                                     description = it.etDescription.text.toString().trim()
+                                    imgUrl = eventPost.photoUrl
                                     quantity = it.etQuantity.text.toString().toInt()
                                     price = it.etPrice.text.toString().toDouble()
 
@@ -154,18 +155,16 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
         resultLauncher.launch(intent)
     }
 
-    private fun uploadImage(
-//        productId: String?,
-        callback: (EventPost) -> Unit,
-    ){
+    private fun uploadImage(productId: String?, callback: (EventPost) -> Unit){
         //instanciar EventPost
         val eventPost  = EventPost()
-//        eventPost.documentId = productId ?: FirebaseFirestore.getInstance()
-//            .collection(Constants.COLL_PRODUCTS).document().id
-
         //ruta donde se guardara en storage la imagen
-        eventPost.documentId = FirebaseFirestore.getInstance()
+            //?: -> en caso de null toma el id del nuevo document (document.Id), sin no con el "id del producto actual" (cuando se actualiza)
+        eventPost.documentId = productId ?: FirebaseFirestore.getInstance()
             .collection(Constants.COLL_PRODUCTS).document().id
+
+//        eventPost.documentId = FirebaseFirestore.getInstance()
+//            .collection(Constants.COLL_PRODUCTS).document().id
         val storageRef = FirebaseStorage.getInstance().reference.child(Constants.PATH_PRODUCT_IMGES)
 
         photoSelectedUri?.let { uri ->
