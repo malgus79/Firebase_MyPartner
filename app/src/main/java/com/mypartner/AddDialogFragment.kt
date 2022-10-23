@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -79,27 +78,31 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
                 binding?.let {
                     enableUI(false)
 
-                    uploadImage()
+                    uploadImage() { eventPost ->
+                        if (eventPost.isSuccess) {
+                            if (product == null) {  //entonces se crea el producto
+                                val product = Product(
+                                    name = it.etName.text.toString().trim(),
+                                    description = it.etDescription.text.toString().trim(),
+                                    imgUrl = eventPost.photoUrl,
+                                    quantity = it.etQuantity.text.toString().toInt(),
+                                    price = it.etPrice.text.toString().toDouble()
+                                )
 
-                    if (product == null) {  //entonces se crea el producto
-                        val product = Product(
-                            name = it.etName.text.toString().trim(),
-                            description = it.etDescription.text.toString().trim(),
-                            quantity = it.etQuantity.text.toString().toInt(),
-                            price = it.etPrice.text.toString().toDouble()
-                        )
+                                save(product, eventPost.documentId!!)
 
-                        save(product)
+                            } else {
+                                //retomar el producto y configurarle los nuevos valores
+                                product?.apply {
+                                    name = it.etName.text.toString().trim()
+                                    description = it.etDescription.text.toString().trim()
+                                    quantity = it.etQuantity.text.toString().toInt()
+                                    price = it.etPrice.text.toString().toDouble()
 
-                    } else {
-                        //retomar el producto y configurarle los nuevos valores
-                        product?.apply {
-                            name = it.etName.text.toString().trim()
-                            description = it.etDescription.text.toString().trim()
-                            quantity = it.etQuantity.text.toString().toInt()
-                            price = it.etPrice.text.toString().toDouble()
+                                    update(this)
 
-                            update(this)
+                                }
+                            }
                         }
                     }
                 }
@@ -143,14 +146,15 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
     }
 
     private fun uploadImage(
-//        productId: String?, callback: (EventPost)->Unit
+//        productId: String?,
+        callback: (EventPost) -> Unit,
     ){
         //instanciar EventPost
         val eventPost  = EventPost()
 //        eventPost.documentId = productId ?: FirebaseFirestore.getInstance()
 //            .collection(Constants.COLL_PRODUCTS).document().id
 
-        //ruta donde se guardara en storage le imagen
+        //ruta donde se guardara en storage la imagen
         eventPost.documentId = FirebaseFirestore.getInstance()
             .collection(Constants.COLL_PRODUCTS).document().id
         val storageRef = FirebaseStorage.getInstance().reference.child(Constants.PATH_PRODUCT_IMGES)
@@ -170,30 +174,34 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
 //                        }
 //                    }
                     .addOnSuccessListener {
-                        //extraer la url para descargar
+                        //extraer la url para descargar en storage
                         it.storage.downloadUrl.addOnSuccessListener { downloadUrl ->
                             Log.i("URL", downloadUrl.toString())
-//                            eventPost.isSuccess = true
-//                            eventPost.photoUrl = downloadUrl.toString()
-//                            callback(eventPost)
+                            //insertar imagen en firestore
+                            eventPost.isSuccess = true
+                            eventPost.photoUrl = downloadUrl.toString()
+                            callback(eventPost)
                         }
                     }
-//                    .addOnFailureListener{
+                    .addOnFailureListener {
 //                        Toast.makeText(activity, "Error al subir imagen.", Toast.LENGTH_SHORT).show()
 //                        enableUI(true)
 //
-//                        eventPost.isSuccess = false
-//                        callback(eventPost)
-//                    }
+                        eventPost.isSuccess = false
+                        callback(eventPost)
+                    }
             }
         }
     }
 
     //insertar producto
-    private fun save(product: Product){
+    private fun save(product: Product, documentId: String){
+        //guardar imagen con vinculacion entre storage y firestore (documentId)
         val db = FirebaseFirestore.getInstance()
         db.collection(Constants.COLL_PRODUCTS)
-            .add(product)
+            .document(documentId)
+            .set(product)
+            //.add(product)
             .addOnSuccessListener {
                 Toast.makeText(activity, "Producto añadido.", Toast.LENGTH_SHORT).show()
             }
