@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -169,18 +170,18 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
 
         photoSelectedUri?.let { uri ->
             binding?.let { binding ->
-//                binding.progressBar.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.VISIBLE
 
                 val photoRef = storageRef.child(eventPost.documentId!!)
 
                 photoRef.putFile(uri)
-//                    .addOnProgressListener {
-//                        val progress = (100 * it.bytesTransferred / it.totalByteCount).toInt()
-//                        it.run {
-//                            binding.progressBar.progress = progress
-//                            binding.tvProgress.text = String.format("%s%%", progress)
-//                        }
-//                    }
+                    .addOnProgressListener {
+                        val progress = (100 * it.bytesTransferred / it.totalByteCount).toInt()
+                        it.run {
+                            binding.progressBar.progress = progress
+                            binding.tvProgress.text = String.format("%s%%", progress)
+                        }
+                    }
                     .addOnSuccessListener {
                         //extraer la url para descargar en storage
                         it.storage.downloadUrl.addOnSuccessListener { downloadUrl ->
@@ -218,6 +219,7 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
             }
             .addOnCompleteListener {
                 enableUI(true)
+                binding?.progressBar?.visibility = View.INVISIBLE
                 dismiss()
             }
     }
@@ -238,6 +240,7 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
                 }
                 .addOnCompleteListener {
                     enableUI(true)
+                    binding?.progressBar?.visibility = View.INVISIBLE
                     dismiss()
                 }
         }
