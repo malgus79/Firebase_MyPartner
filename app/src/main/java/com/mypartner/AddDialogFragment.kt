@@ -14,6 +14,8 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.mypartner.databinding.FragmentDialogAddBinding
@@ -33,14 +35,14 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
         if (it.resultCode == Activity.RESULT_OK){
             photoSelectedUri = it.data?.data
 
-            binding?.imgProductPreview?.setImageURI(photoSelectedUri)  //modo de cargar imagen en el imageView (harcodeado, sin glide)
-//            binding?.let {
-//                Glide.with(this)
-//                    .load(photoSelectedUri)
-//                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-//                    .centerCrop()
-//                    .into(it.imgProductPreview)
-//            }
+//            binding?.imgProductPreview?.setImageURI(photoSelectedUri)  //modo de cargar imagen en el imageView (harcodeado, sin glide)
+            binding?.let {
+                Glide.with(this)
+                    .load(photoSelectedUri)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .centerCrop()
+                    .into(it.imgProductPreview)
+            }
         }
     }
 
@@ -126,6 +128,13 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
                 it.etDescription.setText(product.description)
                 it.etQuantity.setText(product.quantity.toString())
                 it.etPrice.setText(product.price.toString())
+
+                //carga la imagen en el item
+                Glide.with(this)
+                    .load(product.imgUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .centerCrop()
+                    .into(it.imgProductPreview)
             }
         }
     }
