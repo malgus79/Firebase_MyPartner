@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.mypartner.R
 import com.mypartner.databinding.ItemOrderBinding
@@ -47,9 +48,19 @@ class OrderAdaper(private val orderList: MutableList<Order>, private val listene
         holder.binding.tvTotalPrice.text = context.getString(R.string.order_total_price, order.totalPrice)
         //holder.binding.tvTotalPrice.text = order.totalPrice.toString()
 
+        //mostrar los estados
         val index = aKeys.indexOf(order.status)
-        val statusStr = if (index != -1) aValues[index] else context.getString(R.string.order_status_unknown)
-        holder.binding.tvStatus.text = context.getString(R.string.order_status, statusStr)
+        val statusAdapter = ArrayAdapter(context, android.R.layout.simple_dropdown_item_1line, aValues)
+        //configurar el componente del xml (actvStatus)
+        holder.binding.actvStatus.setAdapter(statusAdapter)
+        //si encontro el estaod dentro del array
+        if (index != -1){
+            holder.binding.actvStatus.setText(aValues[index], false)
+        } else {
+            //si no esta en los estados conocidos
+            holder.binding.actvStatus.setText(context.getText(R.string.order_status_unknown), false)
+            //false = para que no pueda ser editable el actv y se comporte como un espinner
+        }
     }
 
     override fun getItemCount(): Int = orderList.size
