@@ -76,6 +76,11 @@ class OrderAdaper(private val orderList: MutableList<Order>, private val listene
 
         //seguir el envio
         fun setListener(order: Order){
+            //ejecutar onStatusChange() de la OrderActivity
+            binding.actvStatus.setOnItemClickListener { adapterView, view, position, id ->
+                order.status = aKeys[position]
+                listener.onStatusChange(order)
+            }
 
             //iniciar el chat
             binding.chpChat.setOnClickListener {

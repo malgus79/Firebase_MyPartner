@@ -121,13 +121,15 @@ class OrderActivity : AppCompatActivity(), OnOrderListener, OrderAux {
 //            .commit()
     }
 
+    //implementar firestore (este metodo se detona desde el adapter, en la inner class ViewHolder)
     override fun onStatusChange(order: Order) {
-//        val db = FirebaseFirestore.getInstance()
-//        db.collection(Constants.COLL_REQUESTS)
-//            .document(order.id)
-//            .update(Constants.PROP_STATUS, order.status)
-//            .addOnSuccessListener {
-//                Toast.makeText(this, "Orden actualizada.", Toast.LENGTH_SHORT).show()
+        val db = FirebaseFirestore.getInstance()
+        db.collection(Constants.COLL_REQUESTS)
+            .document(order.id)
+                //especificar que propiedad (ruta) y el nuevo valor
+            .update(Constants.PROP_STATUS, order.status)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Orden actualizada.", Toast.LENGTH_SHORT).show()
 //                notifyClient(order)
 //                //Analytics
 //                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.ADD_SHIPPING_INFO){
@@ -140,10 +142,10 @@ class OrderActivity : AppCompatActivity(), OnOrderListener, OrderAux {
 //                    param(FirebaseAnalytics.Param.SHIPPING, products.toTypedArray())
 //                    param(FirebaseAnalytics.Param.PRICE, order.totalPrice)
 //                }
-//            }
-//            .addOnFailureListener {
-//                Toast.makeText(this, "Error al actualizar orden.", Toast.LENGTH_SHORT).show()
-//            }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Error al actualizar orden.", Toast.LENGTH_SHORT).show()
+            }
     }
 
     override fun getOrderSelected(): Order = orderSelected
