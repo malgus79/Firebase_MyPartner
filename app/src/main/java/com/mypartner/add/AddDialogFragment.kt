@@ -1,4 +1,4 @@
-package com.mypartner
+package com.mypartner.add
 
 import android.app.Activity
 import android.app.Dialog
@@ -19,7 +19,11 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.mypartner.Constants
+import com.mypartner.entities.EventPost
+import com.mypartner.entities.Product
 import com.mypartner.databinding.FragmentDialogAddBinding
+import com.mypartner.product.MainAux
 
 class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
 

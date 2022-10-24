@@ -1,4 +1,4 @@
-package com.mypartner
+package com.mypartner.entities
 
 class EventPost() {
     var isSuccess: Boolean = false

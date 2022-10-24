@@ -1,4 +1,4 @@
-package com.mypartner
+package com.mypartner.product
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -7,10 +7,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.mypartner.entities.Product
+import com.mypartner.R
 import com.mypartner.databinding.ItemProductBinding
 
 class ProductAdapter(private val productList: MutableList<Product>,
-                     private val listener: OnProductListener) :
+                     private val listener: OnProductListener
+) :
     RecyclerView.Adapter<ProductAdapter.ViewHolder>() {
 
     private lateinit var context: Context

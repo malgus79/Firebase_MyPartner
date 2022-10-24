@@ -1,4 +1,4 @@
-package com.mypartner
+package com.mypartner.entities
 
 import com.google.firebase.firestore.Exclude
 

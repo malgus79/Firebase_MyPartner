@@ -1,4 +1,4 @@
-package com.mypartner
+package com.mypartner.product
 
 import android.os.Bundle
 import android.view.Menu
@@ -15,6 +15,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import com.mypartner.add.AddDialogFragment
+import com.mypartner.Constants
+import com.mypartner.entities.Product
+import com.mypartner.R
 import com.mypartner.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity(), OnProductListener, MainAux {
