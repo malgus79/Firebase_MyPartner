@@ -1,5 +1,6 @@
 package com.mypartner.product
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -20,6 +21,7 @@ import com.mypartner.Constants
 import com.mypartner.entities.Product
 import com.mypartner.R
 import com.mypartner.databinding.ActivityMainBinding
+import com.mypartner.order.OrderActivity
 
 class MainActivity : AppCompatActivity(), OnProductListener, MainAux {
 
@@ -156,10 +158,11 @@ class MainActivity : AppCompatActivity(), OnProductListener, MainAux {
                         }
                     }
             }
+            R.id.action_order_history -> startActivity(Intent(this, OrderActivity::class.java))
         }
         return super.onOptionsItemSelected(item)
     }
-
+/*
     //config Firestore
     private fun configFirestore() {
         val db = FirebaseFirestore.getInstance()
@@ -178,6 +181,7 @@ class MainActivity : AppCompatActivity(), OnProductListener, MainAux {
                 Toast.makeText(this, "Error al consultar datos.", Toast.LENGTH_SHORT).show()
             }
     }
+*/
 
     //config Firestore en tiempo real
     private fun configFirestoreRealTime() {

@@ -65,9 +65,6 @@ class OrderAdaper(private val orderList: MutableList<Order>, private val listene
 
         //seguir el envio
         fun setListener(order: Order){
-            binding.btnTrack.setOnClickListener {
-                listener.onTrack(order)
-            }
 
             //iniciar el chat
             binding.chpChat.setOnClickListener {

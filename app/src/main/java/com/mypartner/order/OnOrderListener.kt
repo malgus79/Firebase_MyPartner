@@ -3,6 +3,7 @@ package com.mypartner.order
 import com.mypartner.entities.Order
 
 interface OnOrderListener {
-    fun onTrack(order: Order)
     fun onStartChat(order: Order)
+    //cambiarle el estado al pedido en cuestion
+    fun onStatusChange(order: Order)
 }
