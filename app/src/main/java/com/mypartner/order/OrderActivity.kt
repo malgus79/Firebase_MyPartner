@@ -9,6 +9,7 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.ktx.Firebase
 import com.mypartner.Constants
 import com.mypartner.R
+import com.mypartner.chat.ChatFragment
 import com.mypartner.databinding.ActivityOrderBinding
 import com.mypartner.entities.Order
 
@@ -109,16 +110,17 @@ class OrderActivity : AppCompatActivity(), OnOrderListener, OrderAux {
 //            }
 //    }
 
+    //iniciar el fragment del chat
     override fun onStartChat(order: Order) {
-//        orderSelected = order
-//
-//        val fragment = ChatFragment()
-//
-//        supportFragmentManager
-//            .beginTransaction()
-//            .add(R.id.containerMain, fragment)
-//            .addToBackStack(null)
-//            .commit()
+        orderSelected = order
+
+        val fragment = ChatFragment()
+
+        supportFragmentManager
+            .beginTransaction()
+            .add(R.id.containerMain, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     //implementar firestore (este metodo se detona desde el adapter, en la inner class ViewHolder)

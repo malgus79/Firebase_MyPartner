@@ -11,4 +11,6 @@ object Constants {
 
     //storage
     const val PATH_PRODUCT_IMGES = "product_images"
+    //Realtime Database
+    const val PATH_CHATS = "chats"
 }
