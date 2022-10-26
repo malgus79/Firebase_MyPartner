@@ -141,17 +141,17 @@ class OrderActivity : AppCompatActivity(), OnOrderListener, OrderAux {
 
                 //aca en el listener exitoso con respecto a cambiar el estado de una orden
                 notifyClient(order)
-                //Analytics
-                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.ADD_SHIPPING_INFO){
-                    val products = mutableListOf<Bundle>()
-                    order.products.forEach {
-                        val bundle = Bundle()
-                        bundle.putString("id_product", it.key)
-                        products.add(bundle)
-                    }
-                    param(FirebaseAnalytics.Param.SHIPPING, products.toTypedArray())
-                    param(FirebaseAnalytics.Param.PRICE, order.totalPrice)
-                }
+//                //Analytics
+//                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.ADD_SHIPPING_INFO){
+//                    val products = mutableListOf<Bundle>()
+//                    order.products.forEach {
+//                        val bundle = Bundle()
+//                        bundle.putString("id_product", it.key)
+//                        products.add(bundle)
+//                    }
+//                    param(FirebaseAnalytics.Param.SHIPPING, products.toTypedArray())
+//                    param(FirebaseAnalytics.Param.PRICE, order.totalPrice)
+//                }
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Error al actualizar orden.", Toast.LENGTH_SHORT).show()

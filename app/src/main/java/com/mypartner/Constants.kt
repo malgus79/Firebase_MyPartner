@@ -17,7 +17,8 @@ object Constants {
     //Realtime Database
     const val PATH_CHATS = "chats"
     //FCM
-    const val MY_PARTNER_RS = "https://nilopartner.000webhostapp.com/NiloPartner/NiloRS.php"
+    const val MY_PARTNER_RS = "https://myfirebaseapp.000webhostapp.com/MyPartner/NiloRS.php"
+    //const val MY_PARTNER_RS = "https://nilopartner.000webhostapp.com/NiloPartner/NiloRS.php"
     const val SEND_NOTIFICATION = "sendNotification"
     const val SEND_NOTIFICATION_BY_TOPIC = "sendNotificationByTopic"
 

@@ -9,15 +9,6 @@ import com.mypartner.MyPartnerApplication
 import org.json.JSONException
 import org.json.JSONObject
 
-/****
- * Project: Nilo Partner
- * From: com.cursosandroidant.nilopartner.fcm
- * Created by Alain Nicolás Tello on 17/06/21 at 9:01
- * All rights reserved 2021.
- *
- * All my Courses(Only on Udemy):
- * https://www.udemy.com/user/alain-nicolas-tello/
- ***/
 class NotificationRS { //RS -> referencia a Remote Service
     fun sendNotification(title: String, message: String, tokens: String){
         //crear un objeto que pueda llevar los parametros declarados
