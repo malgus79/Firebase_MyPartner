@@ -4,6 +4,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.analytics.ktx.logEvent
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.ktx.Firebase
@@ -22,7 +25,7 @@ class OrderActivity : AppCompatActivity(), OnOrderListener, OrderAux {
 
     private lateinit var orderSelected: Order
 
-//    private lateinit var firebaseAnalytics: FirebaseAnalytics
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
 
     //para poder extraer el arrays de valores y claves
     private val aValues: Array<String> by lazy {
@@ -40,7 +43,7 @@ class OrderActivity : AppCompatActivity(), OnOrderListener, OrderAux {
 
         setupRecyclerView()
         setupFirestore()
-//        configAnalytics()
+        configAnalytics()
     }
 
     private fun setupRecyclerView() {
@@ -71,9 +74,10 @@ class OrderActivity : AppCompatActivity(), OnOrderListener, OrderAux {
             }
     }
 
-//    private fun configAnalytics(){
-//        firebaseAnalytics = Firebase.analytics
-//    }
+    //config analytics
+    private fun configAnalytics(){
+        firebaseAnalytics = Firebase.analytics
+    }
 
     private fun notifyClient(order: Order){
         val db = FirebaseFirestore.getInstance()
@@ -141,17 +145,18 @@ class OrderActivity : AppCompatActivity(), OnOrderListener, OrderAux {
 
                 //aca en el listener exitoso con respecto a cambiar el estado de una orden
                 notifyClient(order)
-//                //Analytics
-//                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.ADD_SHIPPING_INFO){
-//                    val products = mutableListOf<Bundle>()
-//                    order.products.forEach {
-//                        val bundle = Bundle()
-//                        bundle.putString("id_product", it.key)
-//                        products.add(bundle)
-//                    }
-//                    param(FirebaseAnalytics.Param.SHIPPING, products.toTypedArray())
-//                    param(FirebaseAnalytics.Param.PRICE, order.totalPrice)
-//                }
+                //Analytics
+                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.ADD_SHIPPING_INFO){
+                    val products = mutableListOf<Bundle>()
+                    order.products.forEach {
+                        val bundle = Bundle()
+                        bundle.putString("id_product", it.key)
+                        products.add(bundle)
+                    }
+                    //enviar los parametros
+                    param(FirebaseAnalytics.Param.SHIPPING, products.toTypedArray())
+                    param(FirebaseAnalytics.Param.PRICE, order.totalPrice)
+                }
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Error al actualizar orden.", Toast.LENGTH_SHORT).show()
