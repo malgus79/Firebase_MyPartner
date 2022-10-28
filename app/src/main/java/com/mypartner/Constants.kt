@@ -13,12 +13,11 @@ object Constants {
     const val PROP_DATE = "date"
 
     //storage
-    const val PATH_PRODUCT_IMGES = "product_images"
+    const val PATH_PRODUCT_IMAGES = "product_images"
     //Realtime Database
     const val PATH_CHATS = "chats"
     //FCM
     const val MY_PARTNER_RS = "https://myfirebaseapp.000webhostapp.com/MyPartner/NiloRS.php"
-    //const val MY_PARTNER_RS = "https://nilopartner.000webhostapp.com/NiloPartner/NiloRS.php"
     const val SEND_NOTIFICATION = "sendNotification"
     const val SEND_NOTIFICATION_BY_TOPIC = "sendNotificationByTopic"
 

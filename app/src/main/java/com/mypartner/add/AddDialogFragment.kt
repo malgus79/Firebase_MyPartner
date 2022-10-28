@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -17,6 +18,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.mypartner.Constants
@@ -24,6 +26,7 @@ import com.mypartner.entities.EventPost
 import com.mypartner.entities.Product
 import com.mypartner.databinding.FragmentDialogAddBinding
 import com.mypartner.product.MainAux
+import java.io.ByteArrayOutputStream
 
 class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
 
@@ -85,7 +88,8 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
                 binding?.let {
                     enableUI(false)
 
-                    uploadImage(product?.id) { eventPost ->
+                    //uploadImage(product?.id) { eventPost ->
+                    uploadReducedImage(product?.id) { eventPost ->
                         if (eventPost.isSuccess) {
                             if (product == null) {  //entonces se crea el producto
                                 val product = Product(
@@ -160,6 +164,57 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
         resultLauncher.launch(intent)
     }
 
+    private fun uploadReducedImage(productId: String?, callback: (EventPost)->Unit){
+        val eventPost  = EventPost()
+        eventPost.documentId = productId ?: FirebaseFirestore.getInstance()
+            .collection(Constants.COLL_PRODUCTS).document().id
+
+
+
+        //identificar el id del usuario, asi se podra guardar las imagenes por usuario
+        FirebaseAuth.getInstance().currentUser?.let { user ->
+            val imagesRef = FirebaseStorage.getInstance().reference.child(user.uid)
+                .child(Constants.PATH_PRODUCT_IMAGES)
+            val photoRef = imagesRef.child(eventPost.documentId!!)
+
+            photoSelectedUri?.let { uri ->
+                binding?.let { binding ->
+//                    getBitmapFromUri(uri)?.let { bitmap ->
+                        binding.progressBar.visibility = View.VISIBLE
+
+//                        val baos = ByteArrayOutputStream()
+//                        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos)
+
+                        photoRef.putFile(uri)
+                        //photoRef.putBytes(baos.toByteArray())
+                            .addOnProgressListener {
+                                val progress = (100 * it.bytesTransferred / it.totalByteCount).toInt()
+                                it.run {
+                                    binding.progressBar.progress = progress
+                                    binding.tvProgress.text = String.format("%s%%", progress)
+                                }
+                            }
+                            .addOnSuccessListener {
+                                it.storage.downloadUrl.addOnSuccessListener { downloadUrl ->
+                                    Log.i("URL", downloadUrl.toString())
+                                    eventPost.isSuccess = true
+                                    eventPost.photoUrl = downloadUrl.toString()
+                                    callback(eventPost)
+                                }
+                            }
+                            .addOnFailureListener{
+                                Toast.makeText(activity, "Error al subir imagen.", Toast.LENGTH_SHORT).show()
+                                enableUI(true)
+
+                                eventPost.isSuccess = false
+                                callback(eventPost)
+                            }
+//                    }
+                }
+            }
+        }
+    }
+
     private fun uploadImage(productId: String?, callback: (EventPost) -> Unit){
         //instanciar EventPost
         val eventPost  = EventPost()
@@ -170,7 +225,7 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
 
 //        eventPost.documentId = FirebaseFirestore.getInstance()
 //            .collection(Constants.COLL_PRODUCTS).document().id
-        val storageRef = FirebaseStorage.getInstance().reference.child(Constants.PATH_PRODUCT_IMGES)
+        val storageRef = FirebaseStorage.getInstance().reference.child(Constants.PATH_PRODUCT_IMAGES)
 
         photoSelectedUri?.let { uri ->
             binding?.let { binding ->
