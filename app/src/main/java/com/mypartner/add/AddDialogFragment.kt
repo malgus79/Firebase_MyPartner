@@ -276,11 +276,29 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
             } else {
                 MediaStore.Images.Media.getBitmap(it.contentResolver, uri)
             }
-
-            return bitmap
-            //return getResizedImage(bitmap, 320)
+            return getResizedImage(bitmap, 320)
         }
         return null
+    }
+
+    //cambiar dimensiones de las imagenes
+    private fun getResizedImage(image: Bitmap, maxSize: Int): Bitmap{
+        var width = image.width
+        var height = image.height
+        //ancho y alto es menor al maximo de la imagen -> no se hace nada
+        if (width <= maxSize && height <= maxSize) return image
+
+        //imagen tiene una dimension mas grande que el tamaño maximo (alto o ancho)
+        // objetivo: mantener el ratio de ese bitmap
+        val bitmapRatio = width.toFloat() / height.toFloat()
+        if (bitmapRatio > 1){
+            width = maxSize
+            height = (width / bitmapRatio).toInt()
+        } else {
+            height = maxSize
+            width = (height / bitmapRatio).toInt()
+        }
+        return Bitmap.createScaledBitmap(image, width, height, true)
     }
 
     //insertar producto
