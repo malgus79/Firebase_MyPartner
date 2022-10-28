@@ -5,7 +5,9 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -164,62 +166,13 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
         resultLauncher.launch(intent)
     }
 
-    private fun uploadReducedImage(productId: String?, callback: (EventPost)->Unit){
-        val eventPost  = EventPost()
-        eventPost.documentId = productId ?: FirebaseFirestore.getInstance()
-            .collection(Constants.COLL_PRODUCTS).document().id
 
-
-
-        //identificar el id del usuario, asi se podra guardar las imagenes por usuario
-        FirebaseAuth.getInstance().currentUser?.let { user ->
-            val imagesRef = FirebaseStorage.getInstance().reference.child(user.uid)
-                .child(Constants.PATH_PRODUCT_IMAGES)
-            val photoRef = imagesRef.child(eventPost.documentId!!)
-
-            photoSelectedUri?.let { uri ->
-                binding?.let { binding ->
-//                    getBitmapFromUri(uri)?.let { bitmap ->
-                        binding.progressBar.visibility = View.VISIBLE
-
-//                        val baos = ByteArrayOutputStream()
-//                        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos)
-
-                        photoRef.putFile(uri)
-                        //photoRef.putBytes(baos.toByteArray())
-                            .addOnProgressListener {
-                                val progress = (100 * it.bytesTransferred / it.totalByteCount).toInt()
-                                it.run {
-                                    binding.progressBar.progress = progress
-                                    binding.tvProgress.text = String.format("%s%%", progress)
-                                }
-                            }
-                            .addOnSuccessListener {
-                                it.storage.downloadUrl.addOnSuccessListener { downloadUrl ->
-                                    Log.i("URL", downloadUrl.toString())
-                                    eventPost.isSuccess = true
-                                    eventPost.photoUrl = downloadUrl.toString()
-                                    callback(eventPost)
-                                }
-                            }
-                            .addOnFailureListener{
-                                Toast.makeText(activity, "Error al subir imagen.", Toast.LENGTH_SHORT).show()
-                                enableUI(true)
-
-                                eventPost.isSuccess = false
-                                callback(eventPost)
-                            }
-//                    }
-                }
-            }
-        }
-    }
-
+    //subir image URI
     private fun uploadImage(productId: String?, callback: (EventPost) -> Unit){
         //instanciar EventPost
         val eventPost  = EventPost()
         //ruta donde se guardara en storage la imagen
-            //?: -> en caso de null toma el id del nuevo document (document.Id), sin no con el "id del producto actual" (cuando se actualiza)
+        //?: -> en caso de null toma el id del nuevo document (document.Id), sin no con el "id del producto actual" (cuando se actualiza)
         eventPost.documentId = productId ?: FirebaseFirestore.getInstance()
             .collection(Constants.COLL_PRODUCTS).document().id
 
@@ -260,6 +213,74 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
                     }
             }
         }
+    }
+
+    //subir image BITMAP
+    private fun uploadReducedImage(productId: String?, callback: (EventPost)->Unit){
+        val eventPost  = EventPost()
+        eventPost.documentId = productId ?: FirebaseFirestore.getInstance()
+            .collection(Constants.COLL_PRODUCTS).document().id
+
+
+
+        //identificar el id del usuario, asi se podra guardar las imagenes por usuario
+        FirebaseAuth.getInstance().currentUser?.let { user ->
+            val imagesRef = FirebaseStorage.getInstance().reference.child(user.uid)
+                .child(Constants.PATH_PRODUCT_IMAGES)
+            val photoRef = imagesRef.child(eventPost.documentId!!)
+
+            photoSelectedUri?.let { uri ->
+                binding?.let { binding ->
+                    getBitmapFromUri(uri)?.let { bitmap ->
+                        binding.progressBar.visibility = View.VISIBLE
+
+                        //para configurar bitmap (formato y calidad)
+                        val baos = ByteArrayOutputStream()
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos)
+
+                        photoRef.putBytes(baos.toByteArray())
+                            .addOnProgressListener {
+                                val progress = (100 * it.bytesTransferred / it.totalByteCount).toInt()
+                                it.run {
+                                    binding.progressBar.progress = progress
+                                    binding.tvProgress.text = String.format("%s%%", progress)
+                                }
+                            }
+                            .addOnSuccessListener {
+                                it.storage.downloadUrl.addOnSuccessListener { downloadUrl ->
+                                    Log.i("URL", downloadUrl.toString())
+                                    eventPost.isSuccess = true
+                                    eventPost.photoUrl = downloadUrl.toString()
+                                    callback(eventPost)
+                                }
+                            }
+                            .addOnFailureListener{
+                                Toast.makeText(activity, "Error al subir imagen.", Toast.LENGTH_SHORT).show()
+                                enableUI(true)
+
+                                eventPost.isSuccess = false
+                                callback(eventPost)
+                            }
+                    }
+                }
+            }
+        }
+    }
+
+    //obtener imagen bitmap desde una uri
+    private fun getBitmapFromUri(uri: Uri): Bitmap?{
+        activity?.let {
+            val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                val source = ImageDecoder.createSource(it.contentResolver, uri)
+                ImageDecoder.decodeBitmap(source)
+            } else {
+                MediaStore.Images.Media.getBitmap(it.contentResolver, uri)
+            }
+
+            return bitmap
+            //return getResizedImage(bitmap, 320)
+        }
+        return null
     }
 
     //insertar producto
