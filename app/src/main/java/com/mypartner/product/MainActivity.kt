@@ -277,6 +277,7 @@ class MainActivity : AppCompatActivity(), OnProductListener, MainAux {
                 product.id?.let { id ->
                     product.imgUrl?.let { url ->
 
+                        //extraer la referencia en base a la url
                         val photoRef = FirebaseStorage.getInstance().getReferenceFromUrl(url)
                         //FirebaseStorage.getInstance().reference.child(Constants.PATH_PRODUCT_IMAGES).child(id)
                         photoRef
