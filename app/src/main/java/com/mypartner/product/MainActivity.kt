@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.analytics.ktx.logEvent
@@ -20,6 +21,7 @@ import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import com.mypartner.add.AddDialogFragment
 import com.mypartner.Constants
 import com.mypartner.entities.Product
@@ -264,6 +266,40 @@ class MainActivity : AppCompatActivity(), OnProductListener, MainAux {
 
     //al hacer click largo
     override fun onLongClick(product: Product) {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.product_dialog_delete_title)
+            .setMessage(R.string.product_dialog_delete_msg)
+            .setPositiveButton(R.string.product_dialog_delete_confirm){_,_->
+
+                val db = FirebaseFirestore.getInstance()
+                val productRef = db.collection(Constants.COLL_PRODUCTS)
+
+                product.id?.let { id ->
+                    product.imgUrl?.let { url ->
+
+                        val photoRef = FirebaseStorage.getInstance().getReferenceFromUrl(url)
+                        //FirebaseStorage.getInstance().reference.child(Constants.PATH_PRODUCT_IMAGES).child(id)
+                        photoRef
+                            .delete()
+                            .addOnSuccessListener {
+                                productRef.document(id)
+                                    .delete()
+                                    .addOnFailureListener {
+                                        Toast.makeText(this, "Error al eliminar registro.", Toast.LENGTH_SHORT).show()
+                                    }
+                            }
+                            .addOnFailureListener {
+                                Toast.makeText(this, "Error al eliminar foto.", Toast.LENGTH_SHORT).show()
+                            }
+                    }
+                }
+            }
+            .setNegativeButton(R.string.dialog_cancel, null)
+            .show()
+    }
+
+/*
+    override fun onLongClick(product: Product) {
         val db = FirebaseFirestore.getInstance()
         val productRef = db.collection(Constants.COLL_PRODUCTS)
 
@@ -276,6 +312,7 @@ class MainActivity : AppCompatActivity(), OnProductListener, MainAux {
                 }
         }
     }
+*/
 
     //devuelve la var global
     override fun getProductSelected(): Product? = productSelected

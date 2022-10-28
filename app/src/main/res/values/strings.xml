@@ -25,4 +25,12 @@
 
     <string name="chat_title">Soporte</string>
 
+    <string name="product_dialog_delete_title">¿Eliminar producto?</string>
+    <string name="product_dialog_delete_msg">El producto se eliminará permanentemente.</string>
+    <string name="product_dialog_delete_confirm">Eliminar</string>
+    <string name="dialog_cancel">Cancelar</string>
+    <string name="hint_title">Título</string>
+    <string name="hint_topic">Topic</string>
+    <string name="action_promo">Promociones</string>
+
 </resources>
