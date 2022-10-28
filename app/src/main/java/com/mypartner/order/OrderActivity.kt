@@ -55,11 +55,12 @@ class OrderActivity : AppCompatActivity(), OnOrderListener, OrderAux {
         }
     }
 
+    //colecciones de ordenes
     private fun setupFirestore(){
         val db = FirebaseFirestore.getInstance()
 
         db.collection(Constants.COLL_REQUESTS)
-//            .orderBy(Constants.PROP_DATE, Query.Direction.DESCENDING)
+            .orderBy(Constants.PROP_DATE, Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener {
                 for (document in it){
