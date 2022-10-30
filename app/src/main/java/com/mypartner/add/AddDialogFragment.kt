@@ -357,6 +357,8 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
                 etDescription.isEnabled = enable
                 etQuantity.isEnabled = enable
                 etPrice.isEnabled = enable
+                progressBar.visibility = if(enable) View.INVISIBLE else View.VISIBLE
+                tvProgress.visibility = if(enable) View.INVISIBLE else View.VISIBLE
             }
         }
     }
