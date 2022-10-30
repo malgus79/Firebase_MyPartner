@@ -28,6 +28,7 @@ import com.mypartner.entities.Product
 import com.mypartner.R
 import com.mypartner.databinding.ActivityMainBinding
 import com.mypartner.order.OrderActivity
+import com.mypartner.promo.PromoFragment
 
 class MainActivity : AppCompatActivity(), OnProductListener, MainAux {
 
@@ -198,6 +199,10 @@ class MainActivity : AppCompatActivity(), OnProductListener, MainAux {
                     }
             }
             R.id.action_order_history -> startActivity(Intent(this, OrderActivity::class.java))
+
+            R.id.action_promo -> {
+                PromoFragment().show(supportFragmentManager, PromoFragment::class.java.simpleName)
+            }
         }
         return super.onOptionsItemSelected(item)
     }
