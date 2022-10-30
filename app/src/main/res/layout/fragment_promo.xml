@@ -96,7 +96,7 @@
         tools:progress="75"
         app:layout_constraintStart_toStartOf="@id/tilTopic"
         app:layout_constraintEnd_toEndOf="@id/tilTopic"
-        app:layout_constraintTop_toTopOf="@id/tilTopic"/>
+        app:layout_constraintTop_toBottomOf="@id/tilTopic"/>
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tvProgress"

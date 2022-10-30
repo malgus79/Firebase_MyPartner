@@ -28,6 +28,7 @@ import com.mypartner.entities.EventPost
 import com.mypartner.entities.Product
 import com.mypartner.databinding.FragmentDialogAddBinding
 import com.mypartner.databinding.FragmentPromoBinding
+import com.mypartner.fcm.NotificationRS
 import com.mypartner.product.MainAux
 import java.io.ByteArrayOutputStream
 
@@ -113,7 +114,7 @@ class PromoFragment : DialogFragment(), DialogInterface.OnShowListener {
         resultLauncher.launch(intent)
     }
 
-        //subir image BITMAP
+    //subir image BITMAP
     private fun uploadReducedImage(){
             photoSelectedUri?.let { uri ->
                 binding?.let { binding ->
@@ -138,6 +139,21 @@ class PromoFragment : DialogFragment(), DialogInterface.OnShowListener {
                             .addOnSuccessListener {
                                 it.storage.downloadUrl.addOnSuccessListener { downloadUrl ->
                                     Log.i("URL", downloadUrl.toString())
+                                    val notificationRS = NotificationRS()
+                                    notificationRS.sendNotificationByTopic(
+                                        binding.etTitle.text.toString().trim(),
+                                        binding.etDescription.text.toString().trim(),
+                                        binding.etTopic.text.toString().trim(),
+                                        downloadUrl.toString()
+                                    ){
+                                        if (it){
+                                            Toast.makeText(activity, "Promoción enviada.", Toast.LENGTH_SHORT).show()
+                                            dismiss()
+                                        } else {
+                                            Toast.makeText(activity, "Error, intente más tarde.", Toast.LENGTH_SHORT).show()
+                                        }
+                                        enableUI(true)
+                                    }
                                 }
                             }
                             .addOnFailureListener{
@@ -159,7 +175,7 @@ class PromoFragment : DialogFragment(), DialogInterface.OnShowListener {
             } else {
                 MediaStore.Images.Media.getBitmap(it.contentResolver, uri)
             }
-            return getResizedImage(bitmap, 320)
+            return getResizedImage(bitmap, 480)
         }
         return null
     }

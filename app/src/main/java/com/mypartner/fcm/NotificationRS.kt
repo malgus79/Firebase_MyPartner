@@ -18,8 +18,8 @@ class NotificationRS { //RS -> referencia a Remote Service
         params.put(Constants.PARAM_TITLE, title)
         params.put(Constants.PARAM_MESSAGE, message)
         params.put(Constants.PARAM_TOKENS, tokens)
-//        params.put(Constants.PARAM_TOPIC, "")
-//        params.put(Constants.PARAM_IMAGE, "")
+        params.put(Constants.PARAM_TOPIC, "")
+        params.put(Constants.PARAM_IMAGE, "")
 
         //enviar esa solicitud
         val jsonObjectRequest: JsonObjectRequest = object : JsonObjectRequest(Method.POST,
@@ -51,41 +51,41 @@ class NotificationRS { //RS -> referencia a Remote Service
         MyPartnerApplication.volleyHelper.addToRequestQueue(jsonObjectRequest)
     }
 
-//    fun sendNotificationByTopic(title: String, message: String, topic: String, photoUrl: String,
-//                                callback: (Boolean)->Unit){
-//        val params = JSONObject()
-//        params.put(Constants.PARAM_METHOD, Constants.SEND_NOTIFICATION_BY_TOPIC)
-//        params.put(Constants.PARAM_TITLE, title)
-//        params.put(Constants.PARAM_MESSAGE, message)
-//        params.put(Constants.PARAM_TOKENS, "")
-//        params.put(Constants.PARAM_TOPIC, topic)
-//        params.put(Constants.PARAM_IMAGE, photoUrl)
-//
-//        val jsonObjectRequest: JsonObjectRequest = object : JsonObjectRequest(Method.POST,
-//            Constants.MY_PARTNER_RS, params, Response.Listener { response ->
-//                try {
-//                    val success = response.getInt(Constants.PARAM_SUCCESS)
-//                    if (success == 3){
-//                        callback(Constants.SUCCESS)
-//                    } else {
-//                        callback(Constants.ERROR)
-//                    }
-//                } catch (e: JSONException){
-//                    e.printStackTrace()
-//                    callback(Constants.ERROR)
-//                }
-//        }, Response.ErrorListener { error ->
-//                if (error.localizedMessage != null){
-//                    callback(Constants.ERROR)
-//                }
-//            }) {
-//            @Throws(AuthFailureError::class)
-//            override fun getHeaders(): MutableMap<String, String> {
-//                val paramsHeaders = HashMap<String, String>()
-//                paramsHeaders["Content-Type"] = "application/json; charset=utf-8"
-//                return super.getHeaders()
-//            }
-//        }
-//        MyPartnerApplication.volleyHelper.addToRequestQueue(jsonObjectRequest)
-//    }
+    fun sendNotificationByTopic(title: String, message: String, topic: String, photoUrl: String,
+                                callback: (Boolean)->Unit){
+        val params = JSONObject()
+        params.put(Constants.PARAM_METHOD, Constants.SEND_NOTIFICATION_BY_TOPIC)
+        params.put(Constants.PARAM_TITLE, title)
+        params.put(Constants.PARAM_MESSAGE, message)
+        params.put(Constants.PARAM_TOKENS, "")
+        params.put(Constants.PARAM_TOPIC, topic)
+        params.put(Constants.PARAM_IMAGE, photoUrl)
+
+        val jsonObjectRequest: JsonObjectRequest = object : JsonObjectRequest(Method.POST,
+            Constants.MY_PARTNER_RS, params, Response.Listener { response ->
+                try {
+                    val success = response.getInt(Constants.PARAM_SUCCESS)
+                    if (success == 3){
+                        callback(Constants.SUCCESS)
+                    } else {
+                        callback(Constants.ERROR)
+                    }
+                } catch (e: JSONException){
+                    e.printStackTrace()
+                    callback(Constants.ERROR)
+                }
+        }, Response.ErrorListener { error ->
+                if (error.localizedMessage != null){
+                    callback(Constants.ERROR)
+                }
+            }) {
+            @Throws(AuthFailureError::class)
+            override fun getHeaders(): MutableMap<String, String> {
+                val paramsHeaders = HashMap<String, String>()
+                paramsHeaders["Content-Type"] = "application/json; charset=utf-8"
+                return super.getHeaders()
+            }
+        }
+        MyPartnerApplication.volleyHelper.addToRequestQueue(jsonObjectRequest)
+    }
 }
