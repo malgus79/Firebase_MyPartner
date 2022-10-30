@@ -86,6 +86,8 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
             positiveButton = it.getButton(Dialog.BUTTON_POSITIVE)
             negativeButton = it.getButton(Dialog.BUTTON_NEGATIVE)
 
+            product?.let { positiveButton?.setText("Actualizar") }
+
             positiveButton?.setOnClickListener {
                 binding?.let {
                     enableUI(false)
@@ -136,6 +138,8 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
         //rellenar le formmulario
         product?.let { product ->
             binding?.let {
+                dialog?.setTitle("Actualizar producto")
+
                 it.etName.setText(product.name)
                 it.etDescription.setText(product.description)
                 it.etQuantity.setText(product.quantity.toString())
