@@ -91,7 +91,7 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
                     enableUI(false)
 
                     //uploadImage(product?.id) { eventPost ->
-                    uploadReducedImage(product?.id) { eventPost ->
+                    uploadReducedImage(product?.id, product?.imgUrl) { eventPost ->
                         if (eventPost.isSuccess) {
                             if (product == null) {  //entonces se crea el producto
                                 val product = Product(
@@ -216,12 +216,11 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
     }
 
     //subir image BITMAP
-    private fun uploadReducedImage(productId: String?, callback: (EventPost)->Unit){
+    private fun uploadReducedImage(productId: String?, imageUrl: String?, callback: (EventPost)->Unit){
         val eventPost  = EventPost()
+        imageUrl?.let { eventPost.photoUrl = it }  //darle valor a la photoUrl (es " " por defecto)
         eventPost.documentId = productId ?: FirebaseFirestore.getInstance()
             .collection(Constants.COLL_PRODUCTS).document().id
-
-
 
         //identificar el id del usuario, asi se podra guardar las imagenes por usuario
         FirebaseAuth.getInstance().currentUser?.let { user ->
@@ -229,9 +228,13 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
                 .child(Constants.PATH_PRODUCT_IMAGES)
             val photoRef = imagesRef.child(eventPost.documentId!!)
 
-            photoSelectedUri?.let { uri ->
+            //photoSelectedUri?.let { uri ->
+            if (photoSelectedUri == null) {
+                eventPost.isSuccess = true
+                callback(eventPost)
+            } else {
                 binding?.let { binding ->
-                    getBitmapFromUri(uri)?.let { bitmap ->
+                    getBitmapFromUri(photoSelectedUri!!)?.let { bitmap ->
                         binding.progressBar.visibility = View.VISIBLE
 
                         //para configurar bitmap (formato y calidad)
