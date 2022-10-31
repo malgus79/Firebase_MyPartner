@@ -101,7 +101,8 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
                                     description = it.etDescription.text.toString().trim(),
                                     imgUrl = eventPost.photoUrl,
                                     quantity = it.etQuantity.text.toString().toInt(),
-                                    price = it.etPrice.text.toString().toDouble()
+                                    price = it.etPrice.text.toString().toDouble(),
+                                    sellerId = eventPost.sellerId
                                 )
 
                                 save(product, eventPost.documentId!!)
@@ -232,6 +233,8 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
                 .child(Constants.PATH_PRODUCT_IMAGES)
             val photoRef = imagesRef.child(eventPost.documentId!!)
 
+            eventPost.sellerId = user.uid
+
             //photoSelectedUri?.let { uri ->
             if (photoSelectedUri == null) {
                 eventPost.isSuccess = true
@@ -318,14 +321,14 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
             //.add(product)
             .addOnSuccessListener {
                 Toast.makeText(activity, "Producto añadido.", Toast.LENGTH_SHORT).show()
+                dismiss()
             }
             .addOnFailureListener {
                 Toast.makeText(activity, "Error al insertar.", Toast.LENGTH_SHORT).show()
+                enableUI(true)
             }
             .addOnCompleteListener {
-                enableUI(true)
                 binding?.progressBar?.visibility = View.INVISIBLE
-                dismiss()
             }
     }
 
