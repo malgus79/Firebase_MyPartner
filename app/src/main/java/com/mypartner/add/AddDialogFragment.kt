@@ -231,7 +231,7 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
         FirebaseAuth.getInstance().currentUser?.let { user ->
             val imagesRef = FirebaseStorage.getInstance().reference.child(user.uid)
                 .child(Constants.PATH_PRODUCT_IMAGES)
-            val photoRef = imagesRef.child(eventPost.documentId!!)
+            val photoRef = imagesRef.child(eventPost.documentId!!).child("image0")
 
             eventPost.sellerId = user.uid
 
