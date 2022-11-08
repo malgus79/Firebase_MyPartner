@@ -28,6 +28,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageException
 import com.mypartner.Constants
 import com.mypartner.R
 import com.mypartner.add.AddDialogFragment
@@ -376,32 +377,44 @@ class MainActivity : AppCompatActivity(), OnProductListener, MainAux {
             .setMessage(R.string.product_dialog_delete_msg)
             .setPositiveButton(R.string.product_dialog_delete_confirm){_,_->
 
-                val db = FirebaseFirestore.getInstance()
-                val productRef = db.collection(Constants.COLL_PRODUCTS)
-
                 product.id?.let { id ->
                     product.imgUrl?.let { url ->
-
-                        //extraer la referencia en base a la url
-                        val photoRef = FirebaseStorage.getInstance().getReferenceFromUrl(url)
-                        //FirebaseStorage.getInstance().reference.child(Constants.PATH_PRODUCT_IMAGES).child(id)
-                        photoRef
-                            .delete()
-                            .addOnSuccessListener {
-                                productRef.document(id)
-                                    .delete()
-                                    .addOnFailureListener {
-                                        Toast.makeText(this, "Error al eliminar registro.", Toast.LENGTH_SHORT).show()
+                        try {  //eliminar la imagen independientemente que "exista o no en storage" o "tenga url o no"
+                            //extraer la referencia en base a la url
+                            val photoRef = FirebaseStorage.getInstance().getReferenceFromUrl(url)
+                            //FirebaseStorage.getInstance().reference.child(Constants.PATH_PRODUCT_IMAGES).child(id)
+                            photoRef
+                                .delete()
+                                .addOnSuccessListener {
+                                    deleteProductFromFirestore(id)
+                                }
+                                .addOnFailureListener {
+                                    if ((it as StorageException).errorCode ==
+                                        StorageException.ERROR_OBJECT_NOT_FOUND) {
+                                        deleteProductFromFirestore(id)
+                                    } else {
+                                        Toast.makeText(this, "Error al eliminar foto.", Toast.LENGTH_SHORT).show()
                                     }
-                            }
-                            .addOnFailureListener {
-                                Toast.makeText(this, "Error al eliminar foto.", Toast.LENGTH_SHORT).show()
-                            }
+                                }
+                        } catch (e:Exception){
+                            e.printStackTrace()
+                            deleteProductFromFirestore(id)
+                        }
                     }
                 }
             }
             .setNegativeButton(R.string.dialog_cancel, null)
             .show()
+    }
+
+    private fun deleteProductFromFirestore(productId: String) {
+        val db = FirebaseFirestore.getInstance()
+        val productRef = db.collection(Constants.COLL_PRODUCTS)
+        productRef.document(productId)
+            .delete()
+            .addOnFailureListener {
+                Toast.makeText(this, "Error al eliminar registro.", Toast.LENGTH_SHORT).show()
+            }
     }
 
     //devuelve la var global
