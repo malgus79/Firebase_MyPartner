@@ -1,10 +1,15 @@
 package com.mypartner.product
 
+import android.content.DialogInterface
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -13,6 +18,7 @@ import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.analytics.ktx.logEvent
@@ -22,11 +28,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
-import com.mypartner.add.AddDialogFragment
 import com.mypartner.Constants
-import com.mypartner.entities.Product
 import com.mypartner.R
+import com.mypartner.add.AddDialogFragment
 import com.mypartner.databinding.ActivityMainBinding
+import com.mypartner.entities.Product
 import com.mypartner.order.OrderActivity
 import com.mypartner.promo.PromoFragment
 
@@ -47,7 +53,7 @@ class MainActivity : AppCompatActivity(), OnProductListener, MainAux {
 
 
     //esperar el resultado
-    private val resultLauncher =
+    private val authLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             //aca se procesa la respuesta
             val response = IdpResponse.fromResultIntent(it.data)
@@ -94,6 +100,64 @@ class MainActivity : AppCompatActivity(), OnProductListener, MainAux {
             }
         }
 
+    private var count = 0
+    private val uriList = mutableListOf<Uri>()
+    private val progressSnackbar: Snackbar by lazy {
+        Snackbar.make(binding.root, "", Snackbar.LENGTH_INDEFINITE)
+    }
+
+    private val galleryResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == RESULT_OK) {
+            if (it.data?.clipData != null) {
+                count = it.data!!.clipData!!.itemCount
+
+                for (i in 0..count-1) {
+                    uriList.add(it.data!!.clipData!!.getItemAt(i).uri)
+                }
+
+                if (count > 0) uploadImage(0)
+            }
+        }
+    }
+
+    private fun uploadImage(position: Int) {
+        //config ruta
+        FirebaseAuth.getInstance().currentUser?.let { user ->
+            progressSnackbar.apply {
+                setText("Subiendo imagen ${position+1} de $count...")
+                show()
+            }
+            val productRef = FirebaseStorage.getInstance().reference
+                .child(user.uid)
+                .child(Constants.PATH_PRODUCT_IMAGES)
+                .child(productSelected!!.id!!)
+                .child("image${position+1}")  // se cambia el nombre dinamicamente para que se crea 1 mas
+
+            //subida
+            productRef.putFile(uriList[position])
+                .addOnSuccessListener {
+                    //sigue a la siguiente imagen
+                    if (position < count-1){
+                        uploadImage(position+1)
+                    } else {
+                        //si no existe una siguiente imagen
+                        progressSnackbar.apply {
+                            setText("Imágenes subidas correctamente!")
+                            setDuration(Snackbar.LENGTH_SHORT)
+                            show()
+                        }
+                    }
+                }
+                .addOnFailureListener {
+                    progressSnackbar.apply {
+                        setText("Error al subir la imagen ${position+1}")
+                        setDuration(Snackbar.LENGTH_LONG)
+                        show()
+                    }
+                }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -123,7 +187,7 @@ class MainActivity : AppCompatActivity(), OnProductListener, MainAux {
                     AuthUI.IdpConfig.EmailBuilder().build(),
                     AuthUI.IdpConfig.GoogleBuilder().build())
 
-                resultLauncher.launch(AuthUI.getInstance()
+                authLauncher.launch(AuthUI.getInstance()
                     .createSignInIntentBuilder()
                     .setAvailableProviders(providers)
                     .setIsSmartLockEnabled(false) //desactivar la muestra de las opciones de uauario
@@ -271,6 +335,42 @@ class MainActivity : AppCompatActivity(), OnProductListener, MainAux {
 
     //al hacer click largo
     override fun onLongClick(product: Product) {
+        val adapter = ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice)
+        adapter.add("Eliminar")
+        adapter.add("Elegir fotos")
+
+        MaterialAlertDialogBuilder(this)
+            .setAdapter(adapter) { dialgInterface: DialogInterface, position: Int ->
+                when(position) {
+                    0 -> confirmDeleteProduct(product)
+                    1 -> {
+                        productSelected = product
+                        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)  //config la seleccion multiple
+                        galleryResult.launch(intent)
+                    }
+                }
+            }
+            .show()
+    }
+
+/*
+    override fun onLongClick(product: Product) {
+        val db = FirebaseFirestore.getInstance()
+        val productRef = db.collection(Constants.COLL_PRODUCTS)
+
+        //eliminar segun el id
+        product.id?.let { id ->
+            productRef.document(id)
+                .delete()
+                .addOnFailureListener {
+                    Toast.makeText(this, "Error al eliminar.", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
+*/
+
+    private fun confirmDeleteProduct(product: Product) {
         MaterialAlertDialogBuilder(this)
             .setTitle(R.string.product_dialog_delete_title)
             .setMessage(R.string.product_dialog_delete_msg)
@@ -303,22 +403,6 @@ class MainActivity : AppCompatActivity(), OnProductListener, MainAux {
             .setNegativeButton(R.string.dialog_cancel, null)
             .show()
     }
-
-/*
-    override fun onLongClick(product: Product) {
-        val db = FirebaseFirestore.getInstance()
-        val productRef = db.collection(Constants.COLL_PRODUCTS)
-
-        //eliminar segun el id
-        product.id?.let { id ->
-            productRef.document(id)
-                .delete()
-                .addOnFailureListener {
-                    Toast.makeText(this, "Error al eliminar.", Toast.LENGTH_SHORT).show()
-                }
-        }
-    }
-*/
 
     //devuelve la var global
     override fun getProductSelected(): Product? = productSelected
